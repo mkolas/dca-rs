@@ -7,7 +7,7 @@ use opus::{Encoder, Channels, CodingMode};
 use std::process::{Command, Stdio};
 use std::path::Path;
 use std::collections::BTreeMap;
-use std::io::{self, Write};
+use std::io::{self, Write, BufWriter, BufReader};
 use std::thread;
 use std::sync::mpsc;
 use std::default::Default;
@@ -286,7 +286,7 @@ fn main() {
                          .spawn()
                          .unwrap_or_else(|e| panic!("Failed to run ffmpeg: {}", e));
 
-        let mut input_pipe = ffmpeg.stdout.unwrap();
+        let mut input_pipe = BufReader::new(ffmpeg.stdout.unwrap());
 
         loop {
 
@@ -316,7 +316,7 @@ fn main() {
         }
 
     } else {
-        let mut input_pipe = io::stdin();
+        let mut input_pipe = BufReader::new(io::stdin());
         loop {
 
             let mut i16_buffer: Vec<i16> = Vec::new();
@@ -391,7 +391,7 @@ struct OutputSettings {
 }
 
 fn output_thread(input: mpsc::Receiver<Vec<u8>>, settings: OutputSettings) {
-    let mut stdout = io::stdout();
+    let mut stdout = BufWriter::new(io::stdout());
     if !settings.raw_output {
         stdout.write(format!("DCA{}", settings.format_file_version).as_bytes()) // magic bytes
               .unwrap();
