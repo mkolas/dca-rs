@@ -90,14 +90,15 @@ fn parse_args<'a>() -> clap::ArgMatches<'a> {
                         .default_value("jpeg"))
                       .arg(Arg::with_name("input")
                         .short("i")
-                        .long("input")
+                        .long("i")
                         .help("input file")
                         .takes_value(true)
                         .value_name("file")
                         .required(true)
                         .default_value("pipe:0"))
                       .arg(Arg::with_name("volume")
-                        .long("volume")
+                        .short("v")
+                        .long("vol")
                         .help("change audio volume (256=normal)")
                         .takes_value(true)
                         .value_name("level")
@@ -119,7 +120,7 @@ fn parse_args<'a>() -> clap::ArgMatches<'a> {
 
     if args.len() == 2 {
         // assume single argument is a file
-        args.insert(1, "--input".to_owned());
+        args.insert(1, "--i".to_owned());
     }
 
     app.get_matches_from(args)
@@ -247,7 +248,7 @@ fn main() {
         bitrate: bitrate as u32,
         max_bytes: max_bytes as usize,
     };
-    thread::spawn(move || {
+    let encoder = thread::spawn(move || {
         encoder_thread(encoder_rx, output_tx, settings);
     });
 
@@ -258,7 +259,7 @@ fn main() {
         metadata_json: metadata_json,
     };
     // stdout output thread
-    thread::spawn(move || {
+    let output = thread::spawn(move || {
         output_thread(output_rx, settings);
     });
 
@@ -293,8 +294,7 @@ fn main() {
             for _ in 0..opus_frame_size {
                 match input_pipe.read_i16::<LittleEndian>() {
                     Ok(val) => i16_buffer.push(val),
-                    Err(e) => {
-                        println_stderr!("Error reading from stdout: {:?}", e);
+                    Err(_) => {
                         break;
                     }
                 }
@@ -303,6 +303,15 @@ fn main() {
                 break;
             }
 
+            if i16_buffer.len() < opus_frame_size as usize {
+                loop {
+                    match i16_buffer.len() % opus_frame_size {
+                        0 => break,
+                        _ => i16_buffer.push(0),
+
+                    }
+                }
+            }
             encoder_tx.send(i16_buffer).unwrap();
         }
 
@@ -320,7 +329,7 @@ fn main() {
                 }
             }
             if i16_buffer.len() == 0 {
-                continue;
+                break;
             }
 
             if i16_buffer.len() < opus_frame_size as usize {
@@ -336,6 +345,9 @@ fn main() {
         }
 
     }
+    drop(encoder_tx);
+    encoder.join().unwrap();
+    output.join().unwrap();
 }
 
 struct EncoderSettings {
@@ -361,8 +373,8 @@ fn encoder_thread(input: mpsc::Receiver<Vec<i16>>,
         let frame = match input.recv() {
             Ok(f) => f,
             Err(_) => {
-                continue;
-            } // no more messages can be sent on this channel
+                break; // no more messages can be sent on this channel
+            }
         };
         let mut f = vec![0u8; settings.max_bytes];
         let len = opus_encoder.encode(&frame, &mut f).unwrap();
@@ -390,9 +402,8 @@ fn output_thread(input: mpsc::Receiver<Vec<u8>>, settings: OutputSettings) {
         let mut output: Vec<u8> = Vec::new();
         let input_data = match input.recv() {
             Ok(i) => i,
-            Err(err) => {
-                println_stderr!("Error in output thread: {}", err);
-                break;
+            Err(_) => {
+                break; // no more messages can be sent on this channel
             }
         };
         let frame_length: i16 = input_data.len() as i16;
