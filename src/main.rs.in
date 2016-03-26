@@ -245,7 +245,7 @@ fn main() {
         sample_rate: sample_rate,
         opus_channels: opus_channels,
         coding_mode: coding_mode,
-        bitrate: bitrate as u32,
+        bitrate: bitrate as i32,
         max_bytes: max_bytes as usize,
     };
     let encoder = thread::spawn(move || {
@@ -354,7 +354,7 @@ struct EncoderSettings {
     sample_rate: u32,
     opus_channels: Channels,
     coding_mode: CodingMode,
-    bitrate: u32,
+    bitrate: i32,
     max_bytes: usize,
 }
 
@@ -367,8 +367,7 @@ fn encoder_thread(input: mpsc::Receiver<Vec<i16>>,
         Ok(e) => e,
         Err(err) => panic!(err),
     };
-    // opus_encoder.set_bitrate(settings.bitrate * 1000).unwrap();
-    // opus binding doesn't support custom bitrate yet
+    opus_encoder.set_bitrate(settings.bitrate * 1000).unwrap();
     loop {
         let frame = match input.recv() {
             Ok(f) => f,

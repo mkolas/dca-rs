@@ -8,7 +8,7 @@ The goal of this project is to match the reference implementation as closely as 
 
 ## Differences
 
-Although dca-rs tries to be a seamless drop-in replacement of the reference implementation, there are some differences which will be explained here:
+Although dca-rs tries to be a seamless drop-in replacement of the reference implementation, there are some differences, as explained below.
 
 ### Command line flags
 
