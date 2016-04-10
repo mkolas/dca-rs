@@ -5,12 +5,12 @@ authors = ["Nicholas Stafie <nicholasstafie@gmail.com>"]
 build = "build.rs"
 
 [build-dependencies]
-serde_codegen = "*"
-syntex = "*"
+serde_codegen = "0.7.0"
+syntex = "0.29.0"
 
 [dependencies]
-clap = "*"
-opus = "*"
-serde = "*"
-serde_json = "*"
-byteorder = "*"
+clap = "2.1.2"
+opus = { git = "https://github.com/nstafie/opus-rs" }
+serde = "0.7.0"
+serde_json = "0.7.0"
+byteorder = "0.5.0"
