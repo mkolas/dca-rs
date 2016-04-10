@@ -78,16 +78,23 @@ pub struct FFProbeFormat {
     #[serde(rename="bit_rate")]
     pub bitrate: String,
     pub probe_score: i32,
-    pub tags: FFProbeTags,
+    pub tags: Option<FFProbeTags>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct FFProbeTags {
+    #[serde(rename="DATE")]
     pub date: Option<String>,
+    #[serde(rename="TRACK")]
     pub track: Option<String>,
+    #[serde(rename="ARTIST")]
     pub artist: Option<String>,
+    #[serde(rename="GENRE")]
     pub genre: Option<String>,
+    #[serde(rename="TITLE")]
     pub title: Option<String>,
+    #[serde(rename="ALBUM")]
     pub album: Option<String>,
+    #[serde(rename="COMPILATION")]
     pub compilation: Option<String>,
 }

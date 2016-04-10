@@ -206,13 +206,14 @@ fn main() {
                               .unwrap_or_else(|e| panic!("Failed to run ffprobe: {}", e));
             let ffprobe_output = std::str::from_utf8(&ffprobe.stdout).unwrap();
             let ffprode_json: FFProbeData = serde_json::from_str(&ffprobe_output).unwrap();
+            let ffprobe_tags = ffprode_json.format.tags.unwrap_or(FFProbeTags { ..Default::default() });
 
             metadata.song_info = SongMetadata {
-                album: ffprode_json.format.tags.album.unwrap_or(String::new()),
+                album: ffprobe_tags.album.unwrap_or(String::new()),
                 comments: String::new(),
-                genre: ffprode_json.format.tags.genre.unwrap_or(String::new()),
-                artist: ffprode_json.format.tags.artist.unwrap_or(String::new()),
-                title: ffprode_json.format.tags.title.unwrap_or(String::new()),
+                genre: ffprobe_tags.genre.unwrap_or(String::new()),
+                artist: ffprobe_tags.artist.unwrap_or(String::new()),
+                title: ffprobe_tags.title.unwrap_or(String::new()),
                 cover: String::new(), // TODO: add cover image support
             };
 
