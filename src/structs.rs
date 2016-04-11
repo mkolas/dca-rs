@@ -67,26 +67,22 @@ pub struct FFProbeData {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct FFProbeFormat {
-    pub filename: String,
-    pub nb_streams: i32,
-    pub nb_programs: i32,
-    pub format_name: String,
-    pub format_long_name: String,
-    pub start_time: String,
-    pub duration: String,
-    pub size: String,
+    pub filename: Option<String>,
+    pub nb_streams: Option<i32>,
+    pub nb_programs: Option<i32>,
+    pub format_name: Option<String>,
+    pub format_long_name: Option<String>,
+    pub start_time: Option<String>,
+    pub duration: Option<String>,
+    pub size: Option<String>,
     #[serde(rename="bit_rate")]
-    pub bitrate: String,
-    pub probe_score: i32,
+    pub bitrate: Option<String>,
+    pub probe_score: Option<i32>,
     pub tags: Option<FFProbeTags>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct FFProbeTags {
-    #[serde(rename="DATE")]
-    pub date: Option<String>,
-    #[serde(rename="TRACK")]
-    pub track: Option<String>,
     #[serde(rename="ARTIST")]
     pub artist: Option<String>,
     #[serde(rename="GENRE")]
@@ -95,6 +91,6 @@ pub struct FFProbeTags {
     pub title: Option<String>,
     #[serde(rename="ALBUM")]
     pub album: Option<String>,
-    #[serde(rename="COMPILATION")]
-    pub compilation: Option<String>,
+    #[serde(rename="COMMENT")]
+    pub comment: Option<String>,
 }
