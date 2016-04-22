@@ -1,0 +1,18 @@
+[package]
+name = "opusfile-sys"
+version = "0.1.1"
+authors = ["Tero Hänninen <lgvz@users.noreply.github.com>"]
+description = "Bindings to libopusfile"
+license = "MIT"
+keywords = ["bindings", "opusfile"]
+repository = "https://github.com/lgvz/rust-opus"
+links = "opusfile"
+build = "build.rs"
+
+[dependencies]
+libc = "0.1"
+ogg-sys = "*"
+opus-sys = "*"
+
+[build-dependencies]
+pkg-config = "*"

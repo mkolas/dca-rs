@@ -19,3 +19,11 @@ For example, `-raw` becomes `--raw`, `-aa` becomes `--aa`, `-vol` becomes `--vol
 Note: `-i` is an exception to this, it can be used with both a single dash (because it is only one letter) and two dashes, to avoid ambiguity.
 
 For more usage information, run dca-rs with the `--help` flag.
+
+## Installation
+
+Download the latest binaries for your platform [from the releases section](https://github.com/nstafie/dca-rs/releases)!
+
+## Usage
+
+Run `./dca-rs --help` for usage information.

@@ -10,7 +10,7 @@ syntex = "0.29.0"
 
 [dependencies]
 clap = "2.1.2"
-opus = { git = "https://github.com/nstafie/opus-rs" }
+opus = { path = "lib/opus-rs" }
 serde = "0.7.0"
 serde_json = "0.7.0"
 byteorder = "0.5.0"
