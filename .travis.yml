@@ -1,0 +1,58 @@
+language: generic
+
+env:
+  global:
+    - PROJECT_NAME=dca-rs
+    - PKG_CONFIG_ALLOW_CROSS=1
+
+matrix:
+  include:
+    - os: linux
+      env: TARGET=armv7-unknown-linux-gnueabihf CHANNEL=stable CC=arm-linux-gnueabihf-gcc
+      sudo: required
+      addons:
+        apt:
+          packages: &armv7_unknown_linux_gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - libc6-armhf-cross
+            - libc6-dev-armhf-cross
+            - qemu-user-static
+            - binfmt-support
+    - os: osx
+      env: TARGET=i686-apple-darwin CHANNEL=stable CFLAGS=-m32 LDFLAGS=-m32
+    - os: linux
+      env: TARGET=i686-unknown-linux-gnu CHANNEL=stable CFLAGS=-m32 LDFLAGS=-m32
+      addons:
+        apt:
+          packages: &i686_unknown_linux_gnu
+            - gcc-multilib
+    - os: osx
+      env: TARGET=x86_64-apple-darwin CHANNEL=stable
+    - os: linux
+      env: TARGET=x86_64-unknown-linux-gnu CHANNEL=stable
+
+before_install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
+
+install:
+  - bash ci/install.sh
+
+script:
+  - bash ci/script.sh
+
+before_deploy:
+  - bash ci/before_deploy.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "vuKeSJ021apfFvVlB9vPkJ9NVbPhxZwLbltceIdxhVjBY4fvkKsOeaYqmFCwi6FHhT7vK4fJrmVrO02m6W9Cc5zxClTfXbw6nZXkzg1VXdYOuJ5CRZ3rXdmGB9vcx6zRPf7YntySrNpcVVR7Z1g+j3fg+haQpJCvCtFZuRl1pc9PYuZuRwheqBl9ZDZsHh2dTAStIeqKC2c3Rep3EoXu3bNyxpJaAJQEtQ4w+WWlMswTe7vpgGgUTMHtIIQIRsKJVD43bpWPUnedsEDF6XiqTcm1KmAJFBDtvcRaZBjYKgvvhS0M+55Vq3rqyXacxo0vLDefQCZIvfTPeiqqhvAKW/4kxvEAnKAevYO7MZCSR3gKnYpA0au1+iUWIXn7Wi3x8CbXYC77p34wdijfcKSdYgG+51XKm1IcObkiFDw0RBi2I6Al9xFCgyMnJjd1V4fxCmfwPr8VStdR/r+Grc7p2MScFoFT11NhMUHwKRAXIbDk+gGlkaaQy0+Xmf9hYnPwEjVBr8m6gGqrCjOzbzvc2qRplOzbRe6KSjiRd310blb1TeTC0EWCAKBMLPWdUajid7Fqu09/x427q4+MMn0LhBHer5oEeg/Deha8frwnpsy2FUrnGY6C/SZNN4RThZYCvIW2rGHgfo99FWbasYAIXZ5YMZJ1D1lGmb6GqnjLxQ8="
+  file: ${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz
+  skip_cleanup: true
+  on:
+    condition: $CHANNEL = stable
+    tags: true
+
+notifications:
+  email:
+    on_success: never
